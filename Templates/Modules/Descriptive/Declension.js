@@ -29,7 +29,7 @@ class Declension {
         return this.variants[type] || [];
     }
 
-    getRandom(type) {
+    render(type) {
         const variants = this.getVariants(type);
 
         if (variants.length === 0) {
@@ -105,6 +105,10 @@ class DeclensionRegistry {
         }
 
         delete this.declensions[name];
+    }
+
+    render(name, type) {
+        return this.getDeclension(name).render(type);
     }
 
     toJSON() {

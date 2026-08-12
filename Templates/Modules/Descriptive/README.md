@@ -1,95 +1,138 @@
-# 🎭 Declensions Module - Быстрый старт
+# 🎭 Declensions Module
 
-## Файлы проекта
-
-- **Declension.js** - основной модуль с классами
+Модуль для хранения вариантов слов/фраз в разных формах и получения случайного варианта.
 
 ## Структура классов
 
-### Класс: Declension
+### Класс: `Declension`
 
-Для работы с одним описанием и его вариантами.
+Работа с одним набором вариантов.
 
 ```javascript
-const desc = new Declension('название', ['type1', 'type2', 'type3']);
+const desc = new Declension(
+    'he.beautiful',
+    ['nominative', 'genitive']
+);
 
 // Методы:
-desc.addVariants(type, variants);      // Добавить варианты
-desc.getVariants(type);                // Получить все варианты
-desc.getRandom(type);                  // Получить случайный
-desc.removeVariant(type, variant);     // Удалить конкретный
-desc.removeAllVariants(type);          // Очистить тип
-desc.clear();                          // Полностью очистить
+desc.addVariants(type, variants);       // Добавить варианты
+desc.getVariants(type);                 // Получить все
+desc.render(type);                      // Получить случайный
+desc.removeVariant(type, variant);      // Удалить вариант
+desc.removeAllVariants(type);           // Очистить тип
+desc.clear();                           // Очистить всё
 ```
 
-### Класс: DeclensionRegistry
+### Класс: `DeclensionRegistry`
 
-Для управления несколькими Declension'ами.
+Управление несколькими `Declension`.
 
 ```javascript
 const registry = new DeclensionRegistry();
 
 // Методы:
-registry.createDeclension(name, types);  // Создать
-registry.getDeclension(name);            // Получить
-registry.removeDeclension(name);         // Удалить
+registry.createDeclension(name, types); // Создать
+registry.getDeclension(name);           // Получить
+registry.removeDeclension(name);        // Удалить
+registry.clear();                       // Очистить всё
 
-registry.toJSON();                       // JSON
-registry.fromJSON(name);
+registry.toJSON();                      // Сохранить
+registry.fromJSON(json);                // Загрузить
 ```
 
-## Примеры использования
+## Примеры
 
-### Пример 1: Простое использование
+### Cклонения
 
 ```javascript
-const beautiful = new Declension('he.beautiful', ['nominative', 'genitive']);
-beautiful.addVariants('nominative', ['красивый', 'прекрасный', 'чудесный']);
-beautiful.addVariants('genitive', ['красивого', 'прекрасного', 'чудесного']);
+const beautiful = new Declension(
+    'he.beautiful',
+    ['nominative', 'genitive']
+);
 
-console.log(beautiful.getRandom('nominative'));  // 'прекрасный'
-console.log(beautiful.getVariants('genitive'));  // ['красивого', ...]
+beautiful.addVariants('nominative', [
+    'красивый',
+    'прекрасный',
+    'чудесный'
+]);
+
+beautiful.addVariants('genitive', [
+    'красивого',
+    'прекрасного',
+    'чудесного'
+]);
+
+console.log(
+    beautiful.render('nominative')
+);
+// "прекрасный"
+
+console.log(
+    beautiful.getVariants('genitive')
+);
+// ["красивого", "прекрасного", "чудесного"]
 ```
 
-### Пример 2: С менеджером
+### С Registry
 
 ```javascript
 const registry = new DeclensionRegistry();
 
-// Создаём переменные
-registry.createDeclension('hero', ['nominative', 'genitive']);
-registry.createDeclension('enemy', ['nominative', 'genitive']);
+registry.createDeclension(
+    'hero',
+    ['nominative', 'genitive']
+);
 
-// Заполняем
+registry.createDeclension(
+    'enemy',
+    ['nominative', 'genitive']
+);
+
 const hero = registry.getDeclension('hero');
-hero.addVariants('nominative', ['герой', 'боец', 'витязь']);
-hero.addVariants('genitive', ['героя', 'бойца', 'витязя']);
-
 const enemy = registry.getDeclension('enemy');
-enemy.addVariants('nominative', ['враг', 'противник']);
-enemy.addVariants('genitive', ['врага', 'противника']);
 
-// Используем
-const h = hero.getRandom('nominative');
-const e = enemy.getRandom('genitive');
-console.log(`${h} готов к бою против ${e}`);  // "боец готов к бою против противника"
+hero.addVariants('nominative', [
+    'герой',
+    'боец',
+    'витязь'
+]);
+
+hero.addVariants('genitive', [
+    'героя',
+    'бойца',
+    'витязя'
+]);
+
+enemy.addVariants('nominative', [
+    'враг',
+    'противник'
+]);
+
+enemy.addVariants('genitive', [
+    'врага',
+    'противника'
+]);
+
+const h = hero.render('nominative');
+const e = registry.render('enemy', 'genitive');
+
+console.log(
+    `${h} готов к бою против ${e}`
+);
+// "боец готов к бою против противника"
 ```
 
-## Обработка ошибок
 
-```javascript
-try {
-    const word = new Declension('тест', ['type1']);
-    word.getRandom('type1');  // Ошибка! type1 пуст
-} catch (error) {
-    console.error(error.message);
-    // "No variants available for type type1."
-}
+## JSON
 
-try {
-    word.addVariants('invalidType', ['вариант']);  // Ошибка! invalidType не существует
-} catch (error) {
-    console.error(error.message);
-    // "Declension type invalidType is not valid."
-}
+Сохранение:
+
+```js
+const json = registry.toJSON();
+```
+
+Восстановление:
+
+```js
+registry.fromJSON(json);
 ```
