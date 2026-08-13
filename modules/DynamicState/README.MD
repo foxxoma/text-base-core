@@ -1,9 +1,8 @@
-
 # 📊 DynamicState Module
 
-Модуль для состояний, которые автоматически определяются по числовому `index`.
+Модуль для создания состояний, зависящих от числового значения.
 
-## Класс: `DynamicState`
+### `DynamicState`
 
 ```javascript
 const health = new DynamicState('health', {
@@ -11,32 +10,35 @@ const health = new DynamicState('health', {
     '21:40': 'low',
     '41:70': 'normal',
     '71:100': 'high'
-});
+}, 80, 0, 100);
 ```
 
-### Методы
+### Основные методы
 
 ```javascript
-health.setIndex(50);    // Установить значение
-health.progress(10);    // Увеличить
-health.regress(10);     // Уменьшить
+health.setIndex(50);     // Установить значение
+health.getIndex();       // Получить текущее значение
+health.progress(10);     // Увеличить значение
+health.regress(10);      // Уменьшить значение
+health.render();         // Получить состояние
 
-health.getIndex();      // Получить значение
-health.render();        // Получить состояние
+health.setDebuff(20);   // Установить debuff
+health.unsetDebuff();   // Убрать debuff
 ```
 
-Пример:
+`debuff` влияет на значение только при получении через `getIndex()`:
 
 ```javascript
-health.setIndex(35);
+health.setIndex(80);
+health.setDebuff(20);
 
-console.log(health.render());
-// "low"
+health.getIndex(); // 60
+health.render();   // "normal"
 ```
 
-## Диапазоны
+### Диапазоны
 
-Поддерживаются открытые диапазоны:
+Можно использовать открытые диапазоны:
 
 ```javascript
 const reputation = new DynamicState('reputation', {
@@ -48,7 +50,7 @@ const reputation = new DynamicState('reputation', {
 });
 ```
 
-## Класс: `DynamicStateRegistry`
+### `DynamicStateRegistry`
 
 Для управления несколькими состояниями:
 
@@ -60,13 +62,23 @@ registry.registerState('health', {
     '21:40': 'low',
     '41:70': 'normal',
     '71:100': 'high'
-});
+}, 80, 0, 100);
 ```
 
-### Методы
+Получение:
 
 ```javascript
-registry.registerState(name, steps, index);
+const health = registry.getState('health');
+
+registry.render('health');
+// "high" or
+health..render('health');
+```
+
+### Методы Registry
+
+```javascript
+registry.registerState(name, steps);
 registry.getState(name);
 registry.render(name);
 registry.removeState(name);
@@ -76,15 +88,4 @@ registry.toJSON();
 registry.fromJSON(json);
 ```
 
-Пример:
-
-```javascript
-registry.getState('health').progress(30);
-
-console.log(
-    registry.render('health')
-);
-// "low"
-```
-
-> `DynamicState` не изменяет состояние напрямую. Состояние вычисляется из `index` и заданных диапазонов при каждом вызове `render()`.
+> `index` — базовое значение. `minIndex` и `maxIndex` ограничивают его, а `debuff` временно изменяет эффективное значение при определении состояния.

@@ -1,37 +1,61 @@
 class DynamicState {
     name = '';
     steps = {};
-    index = 0;
 
-    constructor(name, steps, index = 0) {
+    index = 0;
+    minIndex = null;
+    maxIndex = null;
+    debuff = null;
+
+    constructor(
+        name,
+        steps = {},
+        index = 0,
+        minIndex = null,
+        maxIndex = null,
+        debuff = null
+    ) {
         this.name = name;
         this.steps = steps;
-        this.index = index;
+
+        this.minIndex = minIndex;
+        this.maxIndex = maxIndex;
+        this.debuff = debuff;
+
+        this.setIndex(index);
     }
 
-    setIndex(newIndex) {
-        this.index = newIndex;
-
-        return this;
-    }
-
-    progress(amount) {
-        this.index += amount;
-
-        return this;
-    }
-
-    regress(amount) {
-        this.index -= amount;
+    setIndex(value) {
+        this.index = this.clamp(value);
 
         return this;
     }
 
     getIndex() {
-        return this.index;
+        let index = this.index;
+
+        if (this.debuff !== null) {
+            index -= this.debuff;
+        }
+
+        return this.clamp(index);
+    }
+
+    progress(amount) {
+        return this.setIndex(
+            this.index + amount
+        );
+    }
+
+    regress(amount) {
+        return this.setIndex(
+            this.index - amount
+        );
     }
 
     render() {
+        const index = this.getIndex();
+
         for (const [range, state] of Object.entries(this.steps)) {
             const [fromValue, toValue] = range.split(':');
 
@@ -44,8 +68,8 @@ class DynamicState {
                 : Number(toValue);
 
             if (
-                this.index >= from &&
-                this.index <= to
+                index >= from &&
+                index <= to
             ) {
                 return state;
             }
@@ -53,13 +77,50 @@ class DynamicState {
 
         return 'Unknown';
     }
+
+    setDebuff(value) {
+        this.debuff = value;
+
+        return this;
+    }
+
+    unsetDebuff() {
+        this.debuff = null;
+
+        return this;
+    }
+
+    clamp(value) {
+        if (
+            this.minIndex !== null &&
+            value < this.minIndex
+        ) {
+            return this.minIndex;
+        }
+
+        if (
+            this.maxIndex !== null &&
+            value > this.maxIndex
+        ) {
+            return this.maxIndex;
+        }
+
+        return value;
+    }
 }
 
 
 class DynamicStateRegistry {
     states = {};
 
-    registerState(name, steps, index = 0) {
+    registerState(
+        name,
+        steps = {},
+        index = 0,
+        minIndex = null,
+        maxIndex = null,
+        debuff = null
+    ) {
         if (this.states[name]) {
             throw new Error(
                 `State with name ${name} already exists.`
@@ -69,20 +130,25 @@ class DynamicStateRegistry {
         this.states[name] = new DynamicState(
             name,
             steps,
-            index
+            index,
+            minIndex,
+            maxIndex,
+            debuff
         );
 
         return this.states[name];
     }
 
     getState(name) {
-        if (!this.states[name]) {
+        const state = this.states[name];
+
+        if (!state) {
             throw new Error(
                 `State with name ${name} does not exist.`
             );
         }
 
-        return this.states[name];
+        return state;
     }
 
     render(name) {
@@ -97,10 +163,14 @@ class DynamicStateRegistry {
         }
 
         delete this.states[name];
+
+        return this;
     }
 
     clear() {
         this.states = {};
+
+        return this;
     }
 
     toJSON() {
@@ -109,7 +179,10 @@ class DynamicStateRegistry {
         for (const [name, state] of Object.entries(this.states)) {
             json[name] = {
                 steps: state.steps,
-                index: state.index
+                index: state.index,
+                minIndex: state.minIndex,
+                maxIndex: state.maxIndex,
+                debuff: state.debuff
             };
         }
 
@@ -123,8 +196,13 @@ class DynamicStateRegistry {
             this.states[name] = new DynamicState(
                 name,
                 data.steps,
-                data.index
+                data.index,
+                data.minIndex,
+                data.maxIndex,
+                data.debuff
             );
         }
+
+        return this;
     }
 }
