@@ -1,51 +1,125 @@
-# 📊 DynamicState Module
+# 🧠 DynamicState
 
-Модуль для создания состояний, зависящих от числового значения.
+Числовое состояние с диапазонами и эффектами.
 
-### `DynamicState`
+Поддерживает:
+
+* `minIndex` / `maxIndex`;
+* автоматический `clamp`;
+* диапазоны состояний;
+* именованные эффекты `name: value`;
+* кастомный расчёт через callback;
+
+## Создание
 
 ```javascript
-const health = new DynamicState('health', {
-    '0:20': 'critical',
-    '21:40': 'low',
-    '41:70': 'normal',
-    '71:100': 'high'
-}, 80, 0, 100);
+const health = new DynamicState(
+    'health',
+    {
+        '0:20': 'Critical',
+        '21:50': 'Wounded',
+        '51:80': 'Healthy',
+        '81:100': 'Excellent'
+    },
+    70,
+    0,
+    100
+);
 ```
 
-### Основные методы
+## Значение
 
 ```javascript
-health.setIndex(50);     // Установить значение
-health.getIndex();       // Получить текущее значение
-health.progress(10);     // Увеличить значение
-health.regress(10);      // Уменьшить значение
-health.render();         // Получить состояние
+health.setIndex(50);
 
-health.setDebuff(20);   // Установить debuff
-health.unsetDebuff();   // Убрать debuff
+health.progress(10);
+
+health.regress(5);
+
+health.getIndex();
 ```
 
-`debuff` влияет на значение только при получении через `getIndex()`:
+## Effects
+
+По умолчанию эффекты складываются с `index`.
 
 ```javascript
-health.setIndex(80);
-health.setDebuff(20);
+health.setEffect('poison', -10);
+health.setEffect('blessing', 5);
 
-health.getIndex(); // 60
-health.render();   // "normal"
+health.getIndex();
+// 65
 ```
 
-### Диапазоны
-
-Можно использовать открытые диапазоны:
+Работа с эффектами:
 
 ```javascript
-const reputation = new DynamicState('reputation', {
-    ':-50': 'enemy',
-    '-49:-10': 'hostile',
-    '-9:10': 'neutral',
-    '11:50': 'friendly',
-    '51:': 'ally'
-});
+health.hasEffect('poison');
+
+health.getEffect('poison');
+
+health.getEffects();
+
+health.removeEffect('poison');
+
+health.clearEffects();
+```
+
+## Custom calculation
+
+Для особых случаев можно передать callback:
+
+```javascript
+health.getIndex(
+    (index, effects) => {
+        return index
+            + (effects.blessing ?? 0) * 2
+            + (effects.poison ?? 0);
+    }
+);
+```
+
+Callback получает:
+
+```javascript
+(index, effects)
+```
+
+и его результат автоматически ограничивается `minIndex` / `maxIndex`.
+
+## Render
+
+```javascript
+health.render();
+// "Healthy"
+```
+
+Диапазоны задаются в формате:
+
+```javascript
+{
+    '0:20': 'Critical',
+    '21:50': 'Wounded',
+    '51:80': 'Healthy',
+    '81:100': 'Excellent'
+}
+```
+
+Открытые границы:
+
+```javascript
+{
+    ':0': 'Critical',
+    '1:50': 'Normal',
+    '51:': 'High'
+}
+```
+
+## Serialization
+
+```javascript
+Serializer.register(
+    'DynamicState',
+    DynamicState
+);
 ```

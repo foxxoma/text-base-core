@@ -5,7 +5,8 @@ class DynamicState {
     index = 0;
     minIndex = null;
     maxIndex = null;
-    debuff = null;
+
+    effects = {};
 
     constructor(
         name,
@@ -13,17 +14,24 @@ class DynamicState {
         index = 0,
         minIndex = null,
         maxIndex = null,
-        debuff = null
+        effects = {}
     ) {
         this.name = name;
         this.steps = steps;
 
         this.minIndex = minIndex;
         this.maxIndex = maxIndex;
-        this.debuff = debuff;
+
+        this.effects = {
+            ...effects
+        };
 
         this.setIndex(index);
     }
+
+    // ─────────────────────────────
+    // Index
+    // ─────────────────────────────
 
     setIndex(value) {
         this.index = this.clamp(value);
@@ -31,14 +39,28 @@ class DynamicState {
         return this;
     }
 
-    getIndex() {
-        let index = this.index;
-
-        if (this.debuff !== null) {
-            index -= this.debuff;
+    getIndex(selector = null) {
+        if (selector) {
+            return this.clamp(
+                selector(
+                    this.index,
+                    this.effects
+                )
+            );
         }
 
-        return this.clamp(index);
+        const effects = Object.values(
+            this.effects
+        );
+
+        const modifier = effects.reduce(
+            (total, value) => total + value,
+            0
+        );
+
+        return this.clamp(
+            this.index + modifier
+        );
     }
 
     progress(amount) {
@@ -52,6 +74,64 @@ class DynamicState {
             this.index - amount
         );
     }
+
+    // ─────────────────────────────
+    // Effects
+    // ─────────────────────────────
+
+    setEffect(name, value = 0) {
+        if (
+            !name ||
+            typeof name !== 'string'
+        ) {
+            throw new Error(
+                'Effect name must be a non-empty string.'
+            );
+        }
+
+        if (typeof value !== 'number') {
+            throw new Error(
+                `Effect "${name}" value must be a number.`
+            );
+        }
+
+        this.effects[name] = value;
+
+        return this;
+    }
+
+    getEffect(name) {
+        return this.effects[name] ?? null;
+    }
+
+    hasEffect(name) {
+        return Object.hasOwn(
+            this.effects,
+            name
+        );
+    }
+
+    removeEffect(name) {
+        delete this.effects[name];
+
+        return this;
+    }
+
+    clearEffects() {
+        this.effects = {};
+
+        return this;
+    }
+
+    getEffects() {
+        return {
+            ...this.effects
+        };
+    }
+
+    // ─────────────────────────────
+    // Render
+    // ─────────────────────────────
 
     render() {
         const index = this.getIndex();
@@ -78,17 +158,9 @@ class DynamicState {
         return 'Unknown';
     }
 
-    setDebuff(value) {
-        this.debuff = value;
-
-        return this;
-    }
-
-    unsetDebuff() {
-        this.debuff = null;
-
-        return this;
-    }
+    // ─────────────────────────────
+    // Clamp
+    // ─────────────────────────────
 
     clamp(value) {
         if (
@@ -108,6 +180,10 @@ class DynamicState {
         return value;
     }
 
+    // ─────────────────────────────
+    // JSON
+    // ─────────────────────────────
+
     toJSON() {
         return {
             name: this.name,
@@ -115,7 +191,7 @@ class DynamicState {
             index: this.index,
             minIndex: this.minIndex,
             maxIndex: this.maxIndex,
-            debuff: this.debuff
+            effects: this.effects
         };
     }
 
@@ -126,7 +202,7 @@ class DynamicState {
             data.index,
             data.minIndex,
             data.maxIndex,
-            data.debuff
+            data.effects
         );
     }
 }

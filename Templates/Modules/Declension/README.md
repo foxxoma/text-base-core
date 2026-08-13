@@ -54,4 +54,14 @@ console.log(
     beautiful.getVariants('genitive')
 );
 // ["красивого", "прекрасного", "чудесного"]
+
+// или передать свою функцию получения ключа
+beautiful.render(
+    'nominative',
+    variants => Random.weighted([
+        [0, 10],
+        [1, 3],
+        [2, 1]
+    ])
+);
 ```

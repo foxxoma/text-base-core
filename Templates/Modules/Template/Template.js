@@ -20,27 +20,38 @@ class Template {
         return this.variants;
     }
 
-    getRandomIndex() {
+    getIndex(selector = null) {
         if (this.variants.length === 0) {
             throw new Error(
                 `No variants available for template ${this.name}.`
             );
         }
 
-        return Math.floor(
-            Math.random() * this.variants.length
-        );
+        const index = selector
+            ? selector(this.variants)
+            : Math.floor(
+                Math.random() * this.variants.length
+            );
+
+        if (
+            !Number.isInteger(index) ||
+            index < 0 ||
+            index >= this.variants.length
+        ) {
+            throw new Error(
+                `Invalid template index: ${index}.`
+            );
+        }
+
+        return index;
     }
 
-    getRandom() {
-        const templateIndex = this.getRandomIndex();
-        const template = this.variants[templateIndex];
-
-        return template;
+    getRandom(selector = null) {
+        return this.variants[this.getIndex(selector)];
     }
 
-    render(data = {}) {
-        const templateIndex = this.getRandomIndex();
+    render(data = {}, selector = null) {
+        const templateIndex = this.getIndex(selector);
         const template = this.variants[templateIndex];
 
         return template.replace(

@@ -21,6 +21,18 @@ const template = new Template('greeting', [
 template.render({
     name: 'Алексей'
 });
+
+// или передать свою функцию получения ключа
+template.render(
+    {
+        name: 'Алексей'
+    },
+    (variants) => Random.weighted([
+        [0, 10],
+        [1, 3],
+        [2, 1]
+    ])
+);
 ```
 
 Для:

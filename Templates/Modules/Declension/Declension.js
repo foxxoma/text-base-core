@@ -30,14 +30,32 @@ class Declension {
         return this.variants[type] || [];
     }
 
-    render(type) {
+    render(type, selector = null) {
         const variants = this.getVariants(type);
 
         if (variants.length === 0) {
-            throw new Error(`No variants available for type ${type}.`);
+            throw new Error(
+                `No variants available for type ${type}.`
+            );
         }
 
-        return variants[Math.floor(Math.random() * variants.length)];
+        const index = selector
+            ? selector(variants)
+            : Math.floor(
+                Math.random() * variants.length
+            );
+
+        if (
+            !Number.isInteger(index) ||
+            index < 0 ||
+            index >= variants.length
+        ) {
+            throw new Error(
+                `Invalid variant index: ${index}.`
+            );
+        }
+
+        return variants[index];
     }
 
     removeVariant(type, variant) {
