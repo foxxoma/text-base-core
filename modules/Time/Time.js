@@ -1,4 +1,6 @@
 class Time {
+    date = null;
+
     constructor(date = new Date()) {
         this.date = new Date(date);
     }
@@ -141,7 +143,7 @@ class Time {
         return this.date.toISOString();
     }
 
-    fromJSON(value) {
+    static fromJSON(value) {
         const date = new Date(value);
 
         if (Number.isNaN(date.getTime())) {
@@ -150,8 +152,6 @@ class Time {
             );
         }
 
-        this.date = date;
-
-        return this;
+        return new Time(date);
     }
 }
