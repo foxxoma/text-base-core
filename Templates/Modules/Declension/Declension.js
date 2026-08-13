@@ -3,9 +3,10 @@ class Declension {
     types = [];
     variants = {};
 
-    constructor(name, types) {
+    constructor(name, types, variants = {}) {
         this.name = name;
         this.types = types;
+        this.variants = variants;
     }
 
     addVariants(type, variants) {
@@ -72,13 +73,29 @@ class Declension {
             );
         }
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            types: this.types,
+            variants: this.variants
+        };
+    }
+
+    static fromJSON(data) {
+        return new Declension(
+            data.name,
+            data.types,
+            data.variants
+        );
+    }
 }
 
 class DeclensionRegistry {
     declensions = {};
 
     createDeclension(name, types) {
-        if (this.declensions[name]) {
+        if (Object.hasOwn(this.declensions, name)) {
             throw new Error(
                 `Declension with name ${name} already exists.`
             );
@@ -88,7 +105,7 @@ class DeclensionRegistry {
     }
 
     getDeclension(name) {
-        if (!this.declensions[name]) {
+        if (!Object.hasOwn(this.declensions, name)) {
             throw new Error(
                 `Declension with name ${name} does not exist.`
             );
@@ -98,7 +115,7 @@ class DeclensionRegistry {
     }
 
     removeDeclension(name) {
-        if (!this.declensions[name]) {
+        if (!Object.hasOwn(this.declensions, name)) {
             throw new Error(
                 `Declension with name ${name} does not exist.`
             );
@@ -112,21 +129,16 @@ class DeclensionRegistry {
     }
 
     toJSON() {
-        const json = {};
-        for (const [name, declension] of Object.entries(this.declensions)) {
-            json[name] = {
-                types: declension.types,
-                variants: declension.variants
-            };
-        }
-        return json;
+        return {
+            declensions: this.declensions
+        };
     }
 
-    fromJSON(json) {
-        for (const [name, data] of Object.entries(json)) {
-            const declension = new Declension(name, data.types);
-            declension.variants = data.variants;
-            this.declensions[name] = declension;
-        }
+    static fromJSON(data) {
+        const registry = new DeclensionRegistry();
+
+        registry.declensions = data.declensions;
+
+        return registry;
     }
 }

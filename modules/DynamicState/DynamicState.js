@@ -107,6 +107,28 @@ class DynamicState {
 
         return value;
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            steps: this.steps,
+            index: this.index,
+            minIndex: this.minIndex,
+            maxIndex: this.maxIndex,
+            debuff: this.debuff
+        };
+    }
+
+    static fromJSON(data) {
+        return new DynamicState(
+            data.name,
+            data.steps,
+            data.index,
+            data.minIndex,
+            data.maxIndex,
+            data.debuff
+        );
+    }
 }
 
 
@@ -121,7 +143,7 @@ class DynamicStateRegistry {
         maxIndex = null,
         debuff = null
     ) {
-        if (this.states[name]) {
+        if (Object.hasOwn(this.states, name)) {
             throw new Error(
                 `State with name ${name} already exists.`
             );
@@ -140,15 +162,13 @@ class DynamicStateRegistry {
     }
 
     getState(name) {
-        const state = this.states[name];
-
-        if (!state) {
+        if (!Object.hasOwn(this.states, name)) {
             throw new Error(
                 `State with name ${name} does not exist.`
             );
         }
 
-        return state;
+        return this.states[name];
     }
 
     render(name) {
@@ -156,7 +176,7 @@ class DynamicStateRegistry {
     }
 
     removeState(name) {
-        if (!this.states[name]) {
+        if (!Object.hasOwn(this.states, name)) {
             throw new Error(
                 `State with name ${name} does not exist.`
             );
@@ -174,35 +194,16 @@ class DynamicStateRegistry {
     }
 
     toJSON() {
-        const json = {};
-
-        for (const [name, state] of Object.entries(this.states)) {
-            json[name] = {
-                steps: state.steps,
-                index: state.index,
-                minIndex: state.minIndex,
-                maxIndex: state.maxIndex,
-                debuff: state.debuff
-            };
-        }
-
-        return json;
+        return {
+            states: this.states
+        };
     }
 
-    fromJSON(json) {
-        this.states = {};
+    static fromJSON(data) {
+        const registry = new DynamicStateRegistry();
 
-        for (const [name, data] of Object.entries(json)) {
-            this.states[name] = new DynamicState(
-                name,
-                data.steps,
-                data.index,
-                data.minIndex,
-                data.maxIndex,
-                data.debuff
-            );
-        }
+        registry.states = data.states;
 
-        return this;
+        return registry;
     }
 }

@@ -78,6 +78,20 @@ class Template {
     clear() {
         this.variants = [];
     }
+
+    toJSON() {
+        return {
+            name: this.name,
+            variants: this.variants
+        };
+    }
+
+    static fromJSON(data) {
+        return new Template(
+            data.name,
+            data.variants
+        );
+    }
 }
 
 
@@ -126,28 +140,16 @@ class TemplateRegistry {
     }
 
     toJSON() {
-        const json = {};
-
-        for (const name in this.templates) {
-            json[name] = {
-                name: this.templates[name].name,
-                variants: this.templates[name].variants
-            };
-        }
-
-        return json;
+        return {
+            templates: this.templates
+        };
     }
 
-    fromJSON(json) {
-        this.templates = {};
+    static fromJSON(data) {
+        const registry = new TemplateRegistry();
 
-        for (const name in json) {
-            const templateData = json[name];
+        registry.templates = data.templates;
 
-            this.templates[name] = new Template(
-                templateData.name,
-                templateData.variants
-            );
-        }
+        return registry;
     }
 }
