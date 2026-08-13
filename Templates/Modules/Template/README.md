@@ -15,24 +15,6 @@ const template = new Template('greeting', [
 ]);
 ```
 
-### Класс: `TemplateRegistry`
-
-Управляет несколькими шаблонами.
-
-```js
-const templates = new TemplateRegistry();
-
-templates.createTemplate('greeting', [
-    'Привет, {name}!',
-    'Здравствуйте, {name}!'
-]);
-
-templates.createTemplate('farewell', [
-    'До встречи, {name}!',
-    'Увидимся, {name}!'
-]);
-```
-
 ## Случайный шаблон и Переменные
 
 ```js
@@ -88,33 +70,3 @@ template.removeAllVariants();
 
 template.clear();
 ```
-
-## Registry
-
-```js
-templates.getTemplate('greeting');
-
-templates.render('greeting', {
-    name: 'Алексей'
-});
-
-templates.removeTemplate('greeting');
-
-templates.clear();
-```
-
-## JSON
-
-Сохранение:
-
-```js
-const json = templates.toJSON();
-```
-
-Восстановление:
-
-```js
-templates.fromJSON(json);
-```
-
-> `toJSON()` сохраняет только шаблоны. Функции динамических переменных в JSON не сохраняются.

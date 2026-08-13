@@ -23,23 +23,6 @@ desc.removeAllVariants(type);           // Очистить тип
 desc.clear();                           // Очистить всё
 ```
 
-### Класс: `DeclensionRegistry`
-
-Управление несколькими `Declension`.
-
-```javascript
-const registry = new DeclensionRegistry();
-
-// Методы:
-registry.createDeclension(name, types); // Создать
-registry.getDeclension(name);           // Получить
-registry.removeDeclension(name);        // Удалить
-registry.clear();                       // Очистить всё
-
-registry.toJSON();                      // Сохранить
-registry.fromJSON(json);                // Загрузить
-```
-
 ## Примеры
 
 ### Cклонения
@@ -71,68 +54,4 @@ console.log(
     beautiful.getVariants('genitive')
 );
 // ["красивого", "прекрасного", "чудесного"]
-```
-
-### С Registry
-
-```javascript
-const registry = new DeclensionRegistry();
-
-registry.createDeclension(
-    'hero',
-    ['nominative', 'genitive']
-);
-
-registry.createDeclension(
-    'enemy',
-    ['nominative', 'genitive']
-);
-
-const hero = registry.getDeclension('hero');
-const enemy = registry.getDeclension('enemy');
-
-hero.addVariants('nominative', [
-    'герой',
-    'боец',
-    'витязь'
-]);
-
-hero.addVariants('genitive', [
-    'героя',
-    'бойца',
-    'витязя'
-]);
-
-enemy.addVariants('nominative', [
-    'враг',
-    'противник'
-]);
-
-enemy.addVariants('genitive', [
-    'врага',
-    'противника'
-]);
-
-const h = hero.render('nominative');
-const e = registry.render('enemy', 'genitive');
-
-console.log(
-    `${h} готов к бою против ${e}`
-);
-// "боец готов к бою против противника"
-```
-
-
-## JSON
-
-Сохранение:
-
-```js
-const json = registry.toJSON();
-```
-
-Восстановление:
-
-```js
-registry.fromJSON(json);
 ```
