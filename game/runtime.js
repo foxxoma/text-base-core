@@ -1,6 +1,5 @@
-import { Content } from './core/Content.js';
-import { UI } from './core/UI.js';
-import { DOMUI } from './core/DOMUI.js';
+import { UI } from './core/UI/UI.js';
+import { DOMUI } from './core/UI/DOMUI.js';
 import { Navigation } from './core/Navigation.js';
 
 import { content } from './content.js';
@@ -25,6 +24,6 @@ export const navigation = new Navigation({
     ui,
 
     onChange: () => {
-        console.log('start')
+        console.log('navigate')
     }
 });

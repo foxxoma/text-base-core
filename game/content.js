@@ -11,13 +11,14 @@ import { hi } from './content/templates/npc/base.js';
 
 export const content = new Content();
 
-content.scene(
+
+content.setScene(
     'location.park',
     park
 );
 
 
-content.template(
+content.setTemplate(
     'npc.base.hi',
     hi
 );

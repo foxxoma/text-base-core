@@ -1,3 +1,5 @@
+import { Scene } from '../content/scenes/Scene.js';
+
 export class Navigation {
     stack = [];
 
@@ -22,7 +24,7 @@ export class Navigation {
     // ─────────────────────────────────────────────
 
     call(scene, data = {}) {
-        this.validateScene(scene);
+        this.validateSceneKey(scene);
         this.validateData(data);
 
         const current = this.stack.at(-1);
@@ -50,7 +52,7 @@ export class Navigation {
     }
 
     goto(scene, data = {}) {
-        this.validateScene(scene);
+        this.validateSceneKey(scene);
         this.validateData(data);
 
         this.stack = [{
@@ -93,6 +95,8 @@ export class Navigation {
                 `Scene "${frame.scene}" not found.`
             );
         }
+
+        this.validateScene(scene);
 
         this.ui?.clear();
 
@@ -191,7 +195,7 @@ export class Navigation {
     // Validation
     // ─────────────────────────────────────────────
 
-    validateScene(scene) {
+    validateSceneKey(scene) {
         if (
             typeof scene !== 'string' ||
             scene.trim() === ''
@@ -204,6 +208,14 @@ export class Navigation {
         if (!this.content.scene(scene)) {
             throw new Error(
                 `Scene "${scene}" not found.`
+            );
+        }
+    }
+
+    validateScene(scene) {
+        if (!(scene instanceof Scene)) {
+            throw new TypeError(
+                'Content expects a Scene instance.'
             );
         }
     }

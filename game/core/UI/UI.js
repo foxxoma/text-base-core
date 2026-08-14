@@ -1,6 +1,7 @@
 export class UI {
     content = {};
     actions = [];
+
     listeners = new Set();
 
     set(key, value) {
@@ -31,16 +32,19 @@ export class UI {
     }
 
     apply() {
-        this.emit();
+        const state = {
+            content: this.content,
+            actions: this.actions
+        };
+
+        for (const listener of this.listeners) {
+            listener(state);
+        }
+
+        return this;
     }
 
     subscribe(listener) {
-        if (typeof listener !== 'function') {
-            throw new Error(
-                'UI listener must be a function.'
-            );
-        }
-
         this.listeners.add(listener);
 
         return this;
@@ -50,11 +54,5 @@ export class UI {
         this.listeners.delete(listener);
 
         return this;
-    }
-
-    emit() {
-        for (const listener of this.listeners) {
-            listener(this);
-        }
     }
 }

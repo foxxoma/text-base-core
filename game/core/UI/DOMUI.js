@@ -3,27 +3,28 @@ export class DOMUI {
         content = {},
         actions = null
     } = {}) {
-        this.ui = ui;
-
         this.content = content;
         this.actions = actions;
 
-        this.ui.subscribe(
-            this.render.bind(this)
+        ui.subscribe(
+            state => this.render(state)
+        );
+    }
+
+    render(state) {
+        this.renderContent(
+            state.content
         );
 
-        this.render();
+        this.renderActions(
+            state.actions
+        );
     }
 
-    render() {
-        this.renderContent();
-        this.renderActions();
-    }
+    renderContent(content) {
+        for (const [key, selector]
+            of Object.entries(this.content)) {
 
-    renderContent() {
-        for (const [key, selector] of Object.entries(
-            this.content
-        )) {
             const element =
                 document.querySelector(selector);
 
@@ -32,11 +33,11 @@ export class DOMUI {
             }
 
             element.textContent =
-                this.ui.get(key) ?? '';
+                content[key] ?? '';
         }
     }
 
-    renderActions() {
+    renderActions(actions) {
         if (!this.actions) {
             return;
         }
@@ -50,7 +51,7 @@ export class DOMUI {
 
         element.innerHTML = '';
 
-        for (const action of this.ui.getActions()) {
+        for (const action of actions) {
             const button =
                 document.createElement('button');
 

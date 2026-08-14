@@ -5,7 +5,7 @@ import { content } from '../../../content.js';
 
 export const park = new Scene((data) => {
     const player = data.player;
-    const template = content.template(
+    const hi = content.template(
         'npc.base.hi'
     );
 
@@ -16,7 +16,7 @@ export const park = new Scene((data) => {
 
     ui.set(
         'text',
-        template.render({
+        hi.render({
             name: player.name
         })
     );
@@ -34,9 +34,20 @@ export const park = new Scene((data) => {
         text: 'Осмотреться',
 
         action: () => {
+            player.health.regress(10);
+
             ui.set(
                 'text',
-                'Вокруг тихо. Ты замечаешь старую скамейку.'
+                'Вокруг тихо. Ты замечаешь старую скамейку, а здоровье уплао на 10. просто так.'
+            );
+
+            ui.set(
+                'status',
+                `Здоровье: ${
+                    player.health.getIndex()
+                } — ${
+                    player.health.render()
+                }`
             );
 
             ui.apply()
