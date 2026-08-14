@@ -1,9 +1,7 @@
-class Template {
-    name = '';
+export class Template {
     variants = [];
 
-    constructor(name, variants = []) {
-        this.name = name;
+    constructor(variants = []) {
         this.variants = [...new Set(variants)];
     }
 
@@ -23,7 +21,7 @@ class Template {
     getIndex(selector = null) {
         if (this.variants.length === 0) {
             throw new Error(
-                `No variants available for template ${this.name}.`
+                `No variants available for template.`
             );
         }
 
@@ -79,7 +77,7 @@ class Template {
 
         if (index === -1) {
             throw new Error(
-                `Variant "${variant}" not found in template ${this.name}.`
+                `Variant "${variant}" not found in template.`
             );
         }
 
@@ -92,14 +90,12 @@ class Template {
 
     toJSON() {
         return {
-            name: this.name,
             variants: this.variants
         };
     }
 
     static fromJSON(data) {
         return new Template(
-            data.name,
             data.variants
         );
     }

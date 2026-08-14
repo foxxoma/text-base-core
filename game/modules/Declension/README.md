@@ -10,8 +10,11 @@
 
 ```javascript
 const desc = new Declension(
-    'he.beautiful',
-    ['nominative', 'genitive']
+    ['nominative', 'genitive'],
+    {
+        'nominative' => nominativeVariants,
+        'genitive' => genitiveVariants
+    }
 );
 
 // Методы:

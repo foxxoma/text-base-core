@@ -1,4 +1,4 @@
-class Scene {
+export class Scene {
     constructor(main) {
         if (typeof main !== 'function') {
             throw new Error(

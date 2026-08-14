@@ -1,5 +1,4 @@
-class DynamicState {
-    name = '';
+export class DynamicState {
     steps = {};
 
     index = 0;
@@ -9,14 +8,12 @@ class DynamicState {
     effects = {};
 
     constructor(
-        name,
         steps = {},
         index = 0,
         minIndex = null,
         maxIndex = null,
         effects = {}
     ) {
-        this.name = name;
         this.steps = steps;
 
         this.minIndex = minIndex;
@@ -186,7 +183,6 @@ class DynamicState {
 
     toJSON() {
         return {
-            name: this.name,
             steps: this.steps,
             index: this.index,
             minIndex: this.minIndex,
@@ -197,7 +193,6 @@ class DynamicState {
 
     static fromJSON(data) {
         return new DynamicState(
-            data.name,
             data.steps,
             data.index,
             data.minIndex,

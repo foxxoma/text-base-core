@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Text Game Test</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+
+            font-family: sans-serif;
+            background: #111;
+            color: #eee;
+        }
+
+        .game {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .game-title {
+            margin-bottom: 10px;
+        }
+
+        .game-status {
+            margin-bottom: 30px;
+            opacity: 0.7;
+        }
+
+        .game-text {
+            min-height: 120px;
+            margin-bottom: 30px;
+            white-space: pre-line;
+        }
+
+        .game-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .game-actions button {
+            padding: 12px 16px;
+            cursor: pointer;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <h1 class="game-title"></h1>
+
+    <div class="game-status"></div>
+
+    <div class="game-text"></div>
+
+    <div class="game-actions"></div>
+
+</div>
+
+<script
+    type="module"
+    src="./main.js"
+></script>
+
+</body>
+</html>

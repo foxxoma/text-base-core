@@ -1,4 +1,4 @@
-class Serializer {
+export class Serializer {
     static types = new Map();
 
     static TYPE_KEY = '__serializer';

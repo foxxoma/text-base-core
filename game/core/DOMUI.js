@@ -1,4 +1,4 @@
-class DOMUI {
+export class DOMUI {
     constructor(ui, {
         content = {},
         actions = null
@@ -7,6 +7,12 @@ class DOMUI {
 
         this.content = content;
         this.actions = actions;
+
+        this.ui.subscribe(
+            this.render.bind(this)
+        );
+
+        this.render();
     }
 
     render() {
@@ -18,7 +24,8 @@ class DOMUI {
         for (const [key, selector] of Object.entries(
             this.content
         )) {
-            const element = document.querySelector(selector);
+            const element =
+                document.querySelector(selector);
 
             if (!element) {
                 continue;
@@ -34,9 +41,8 @@ class DOMUI {
             return;
         }
 
-        const element = document.querySelector(
-            this.actions
-        );
+        const element =
+            document.querySelector(this.actions);
 
         if (!element) {
             return;
@@ -45,7 +51,8 @@ class DOMUI {
         element.innerHTML = '';
 
         for (const action of this.ui.getActions()) {
-            const button = document.createElement('button');
+            const button =
+                document.createElement('button');
 
             button.textContent =
                 typeof action.text === 'function'

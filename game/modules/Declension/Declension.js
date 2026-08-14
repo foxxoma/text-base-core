@@ -1,10 +1,8 @@
-class Declension {
-    name = '';
+export class Declension {
     types = [];
     variants = {};
 
-    constructor(name, types, variants = {}) {
-        this.name = name;
+    constructor(types, variants = {}) {
         this.types = types;
         this.variants = variants;
     }
@@ -94,7 +92,6 @@ class Declension {
 
     toJSON() {
         return {
-            name: this.name,
             types: this.types,
             variants: this.variants
         };
@@ -102,7 +99,6 @@ class Declension {
 
     static fromJSON(data) {
         return new Declension(
-            data.name,
             data.types,
             data.variants
         );

@@ -1,4 +1,4 @@
-class Random {
+export class Random {
     static float(min = 0, max = 1) {
         if (min > max) {
             throw new Error(

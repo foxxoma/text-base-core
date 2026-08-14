@@ -1,4 +1,4 @@
-class Time {
+export class Time {
     date = null;
 
     constructor(date = new Date()) {
