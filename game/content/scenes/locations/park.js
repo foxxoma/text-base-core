@@ -23,11 +23,11 @@ export const park = new Scene((data) => {
 
     ui.set(
         'status',
-        `Здоровье: ${
-            player.health.getIndex()
-        } — ${
-            player.health.render()
-        }`
+        'Здоровье: {healthIndex} — {health}',
+        {
+            'healthIndex': player.health.getIndex(),
+            'health': player.health.render()
+        }
     );
 
     ui.addAction({

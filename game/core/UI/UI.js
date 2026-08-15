@@ -4,10 +4,49 @@ export class UI {
 
     listeners = new Set();
 
-    set(key, value) {
+    set(key, value, data = {}) {
+        if (data) {
+            value =  value.replace(
+                /\{(\w+)\}/g,
+                (match, key) => {
+                    if (!(key in data)) {
+                        throw new Error(
+                            `Variable {${key}} is not defined.`
+                        );
+                    }
+
+                    return data[key];
+                }
+            );
+        }
+
         this.content[key] = value;
 
         return this;
+    }
+
+    render(data = {}, selector = null) {
+        const templateIndex = this.getIndex(selector);
+        const template = this.variants[templateIndex];
+
+        return template.replace(
+            /\{(\w+)\}/g,
+            (match, key) => {
+                if (!(key in data)) {
+                    throw new Error(
+                        `Variable {${key}} is not defined.`
+                    );
+                }
+
+                const value = data[key];
+
+                if (typeof value === 'function') {
+                    return value(templateIndex);
+                }
+
+                return value;
+            }
+        );
     }
 
     get(key) {
