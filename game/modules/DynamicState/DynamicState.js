@@ -7,6 +7,8 @@ export class DynamicState {
 
     effects = {};
 
+    listeners = new Set();
+
     constructor(
         steps = {},
         index = 0,
@@ -31,7 +33,24 @@ export class DynamicState {
     // ─────────────────────────────
 
     setIndex(value) {
-        this.index = this.clamp(value);
+        const nextIndex =
+            this.clamp(value);
+
+        if (nextIndex === this.index) {
+            return this;
+        }
+
+        const previous =
+            this.index;
+
+        this.index = nextIndex;
+
+        this.emit({
+            type: 'index',
+            previous,
+            value: this.index,
+            state: this
+        });
 
         return this;
     }
@@ -92,7 +111,22 @@ export class DynamicState {
             );
         }
 
+        const previous =
+            this.effects[name];
+
+        if (previous === value) {
+            return this;
+        }
+
         this.effects[name] = value;
+
+        this.emit({
+            type: 'effect',
+            name,
+            previous,
+            value,
+            state: this
+        });
 
         return this;
     }
@@ -109,13 +143,45 @@ export class DynamicState {
     }
 
     removeEffect(name) {
+        if (!this.hasEffect(name)) {
+            return this;
+        }
+
+        const previous =
+            this.effects[name];
+
         delete this.effects[name];
+
+        this.emit({
+            type: 'effect',
+            name,
+            previous,
+            value: undefined,
+            state: this
+        });
 
         return this;
     }
 
     clearEffects() {
+        if (
+            Object.keys(this.effects).length === 0
+        ) {
+            return this;
+        }
+
+        const previous = {
+            ...this.effects
+        };
+
         this.effects = {};
+
+        this.emit({
+            type: 'effects',
+            previous,
+            value: {},
+            state: this
+        });
 
         return this;
     }
@@ -127,22 +193,54 @@ export class DynamicState {
     }
 
     // ─────────────────────────────
+    // Events
+    // ─────────────────────────────
+
+    onChange(listener) {
+        if (typeof listener !== 'function') {
+            throw new TypeError(
+                'Change listener must be a function.'
+            );
+        }
+
+        this.listeners.add(listener);
+
+        return () => {
+            this.listeners.delete(listener);
+        };
+    }
+
+    emit(change) {
+        for (const listener of this.listeners) {
+            listener(change);
+        }
+    }
+
+    // ─────────────────────────────
     // Render
     // ─────────────────────────────
 
     render() {
         const index = this.getIndex();
 
-        for (const [range, state] of Object.entries(this.steps)) {
-            const [fromValue, toValue] = range.split(':');
+        for (
+            const [range, state]
+            of Object.entries(this.steps)
+        ) {
+            const [
+                fromValue,
+                toValue
+            ] = range.split(':');
 
-            const from = fromValue === ''
-                ? -Infinity
-                : Number(fromValue);
+            const from =
+                fromValue === ''
+                    ? -Infinity
+                    : Number(fromValue);
 
-            const to = toValue === ''
-                ? Infinity
-                : Number(toValue);
+            const to =
+                toValue === ''
+                    ? Infinity
+                    : Number(toValue);
 
             if (
                 index >= from &&
